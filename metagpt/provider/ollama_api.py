@@ -38,7 +38,9 @@ class OllamaMessageBase:
         raise NotImplementedError
 
     def decode(self, response: OpenAIResponse) -> dict:
-        return json.loads(response.data.decode("utf-8"))
+        res = response.data.decode("utf-8")
+        # print(f"    |ollama response:{res}")
+        return json.loads(res)
 
     def get_choice(self, to_choice_dict: dict) -> str:
         raise NotImplementedError
@@ -236,7 +238,7 @@ class OllamaLLM(BaseLLM):
         return self.ollama_message.get_choice(rsp)
 
     async def acompletion(self, messages: list[dict], timeout=USE_CONFIG_TIMEOUT) -> dict:
-        return await self._achat_completion(messages, timeout=self.get_timeout(timeout))
+        return await self.acompletion_text(messages, timeout=self.get_timeout(timeout))
 
     async def _achat_completion_stream(self, messages: list[dict], timeout: int = USE_CONFIG_TIMEOUT) -> str:
         resp, _, _ = await self.client.arequest(

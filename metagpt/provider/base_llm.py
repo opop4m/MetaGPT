@@ -195,9 +195,11 @@ class BaseLLM(ABC):
         retry_error_callback=log_and_reraise,
     )
     async def acompletion_text(
-        self, messages: list[dict], stream: bool = False, timeout: int = USE_CONFIG_TIMEOUT
+        self, messages: list[dict], stream: bool = None, timeout: int = USE_CONFIG_TIMEOUT
     ) -> str:
         """Asynchronous version of completion. Return str. Support stream-print"""
+        if stream is None:
+            stream = self.config.stream
         if stream:
             return await self._achat_completion_stream(messages, timeout=self.get_timeout(timeout))
         resp = await self._achat_completion(messages, timeout=self.get_timeout(timeout))
